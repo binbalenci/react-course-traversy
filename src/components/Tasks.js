@@ -1,7 +1,6 @@
-import { useState } from 'react';
 import Task from './Task';
 
-const Tasks = ({ tasks }) => {
+const Tasks = ({ tasks, onDelete, onToggle }) => {
   // Now tasks are inside of our component instead of being outside
   // In order to change tasks, we can use setTasks
   // State is immutable so you cannot use tasks.push()
@@ -23,7 +22,12 @@ const Tasks = ({ tasks }) => {
   return (
     <>
       {tasks.map((task) => (
-        <Task key={task.id} task={task} />
+        <Task
+          key={task.id}
+          task={task}
+          onDelete={onDelete}
+          onToggle={onToggle}
+        />
       ))}
     </>
   );
