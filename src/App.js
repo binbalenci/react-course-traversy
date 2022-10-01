@@ -1,38 +1,20 @@
 import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from 'react-query';
 import Header from './components/Header';
 import Tasks from './components/Tasks';
 import AddTask from './components/AddTask';
+import { useTaskQuery } from './query-hooks/useTasksQuery';
+import { useTasksUpdateMutation } from './query-hooks/useTasksUpdateMutation';
+
+// const fetchTasks = async () => {
+//   return fetch('http://localhost:5000/tasks').then((e) => e.json());
+// };
 
 const App = () => {
   const [showAddTask, setShowAddTask] = useState(false);
-
   const [tasks, setTasks] = useState([]);
-
-  useEffect(() => {
-    const fetchTasks = async () => {
-      const res = await fetch('http:localhost:5000/tasks');
-    };
-  });
-
-  // Add task
-  const addTask = (task) => {
-    // Add the task to the list
-    setTasks([
-      ...tasks,
-      {
-        id: tasks.length + 1,
-        text: task.text,
-        day: task.day,
-        reminder: task.reminder,
-      },
-    ]);
-  };
-
-  // Delete task
-  const deleteTask = (id) => {
-    // Show the remaining tasks after deleting one
-    setTasks(tasks.filter((task) => task.id !== id));
-  };
+  const { data, isLoading, isFetching } = useTaskQuery();
+  const { mutate: updateTasks } = useTasksUpdateMutation();
 
   // Toggle reminder
   const toggleReminder = (id) => {
@@ -50,9 +32,16 @@ const App = () => {
         onShow={() => setShowAddTask(!showAddTask)}
         showAdd={showAddTask}
       />
-      {showAddTask && <AddTask onAdd={addTask} />}
-      {tasks.length > 0 ? (
-        <Tasks tasks={tasks} onDelete={deleteTask} onToggle={toggleReminder} />
+      {isLoading && <h3>Loading</h3>}
+      {showAddTask && (
+        <AddTask
+          onAdd={(task) => {
+            updateTasks(task);
+          }}
+        />
+      )}
+      {!!data ? (
+        <Tasks tasks={data} onToggle={toggleReminder} />
       ) : (
         'No tasks to show'
       )}
